@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A COMP5578 launch-time resource verification demo based on the NIKKE PC launcher incident.">
+  <title>Supply Shield · COMP5578</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="mast">
+    <div class="frame mast-inner">
+      <a class="brand" href="?">
+        <img src="./icon.svg" alt="" width="42" height="42">
+        <span>Supply Shield <small data-copy="brandSub">供应链盾</small></span>
+      </a>
+      <div class="mast-right">
+        <span class="class-id">COMP5578 <span>·</span> OPTION 2</span>
+        <button type="button" id="language" class="plain" lang="en" aria-label="Switch to English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="frame">
+    <section class="hero" aria-labelledby="heroHeading">
+      <div>
+        <p class="label"><span class="dot"></span><span data-copy="caseLabel">NIKKE PC 启动器 · 案例实验</span></p>
+        <h1 id="heroHeading" data-copy="heading">启动器签名有效，<br>脚本仍需核验</h1>
+        <p class="lede" data-copy="lede">在网页里亲手修改一份 CDN 脚本，再修改发布清单，观察两道检查如何拦截。</p>
+      </div>
+      <div class="case-numbers">
+        <div><strong>04</strong><span data-copy="four">份运行时 JavaScript 被改</span></div>
+        <div><strong>&lt;10<span data-copy="min"> 分钟</span></strong><span data-copy="ten">研究人员观察到的窃密链</span></div>
+      </div>
+    </section>
+
+    <details class="case-notes">
+      <summary data-copy="caseSummary">事件经过与来源</summary>
+      <p data-copy="caseText"></p>
+      <ol class="timeline" id="caseTimeline"></ol>
+      <div class="sources">
+        <a href="https://www.bitdefender.com/en-gb/blog/labs/nikke-game-launcher-malware" target="_blank" rel="noreferrer">Bitdefender Labs ↗</a>
+        <a href="https://gist.github.com/MotherSphere/d6c049a09ba8ac3085c51ee9df24a4e5" target="_blank" rel="noreferrer">MotherSphere ↗</a>
+      </div>
+    </details>
+
+    <section class="bench" aria-labelledby="benchHeading">
+      <div class="bench-top">
+        <div>
+          <p class="label" data-copy="benchLabel">LIVE VERIFICATION</p>
+          <h2 id="benchHeading" data-copy="benchHeading">加载前验证</h2>
+        </div>
+        <div class="actions">
+          <button type="button" id="reset" class="plain" data-copy="reset">恢复原始样本</button>
+          <button type="button" id="run" class="primary" data-copy="run">运行验证</button>
+        </div>
+      </div>
+      <div class="path-strip" aria-label="Launcher resource path">
+        <div><small data-copy="launcher">启动器（模拟）</small><strong>nikke_launcher.exe</strong><span class="pill stable" data-copy="fixed">有效签名 · 未变化</span></div>
+        <span aria-hidden="true" class="arrow">→</span>
+        <div><small data-copy="distribution">CDN（模拟）</small><strong data-copy="runtime">4 份运行时脚本</strong><span class="pill neutral" data-copy="staged">资源暂存</span></div>
+        <span aria-hidden="true" class="arrow">→</span>
+        <div><small data-copy="gate">加载关口</small><strong data-copy="signedGate">清单验签 + SHA-256</strong><span id="pathState" class="pill neutral"></span></div>
+      </div>
+
+      <div id="verdict" class="verdict" data-state="pending" role="status" aria-live="polite"></div>
+      <div id="signals" class="signals"></div>
+
+      <div class="editors">
+        <article>
+          <label for="resource" data-copy="fileLabel">01 / 修改 CDN 脚本</label>
+          <select id="resource"></select>
+          <label for="editor" class="sr" data-copy="editorLabel">脚本内容</label>
+          <textarea id="editor" spellcheck="false" maxlength="4096" autocomplete="off" autocapitalize="off" aria-describedby="fileHint"></textarea>
+          <p class="hint" id="fileHint" data-copy="fileHint">在末尾手动加一行 // pre，然后运行验证。</p>
+        </article>
+        <article>
+          <label for="expected" data-copy="expectedLabel">02 / 修改发布清单指纹</label>
+          <input id="expected" maxlength="64" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="manifestHint">
+          <p class="hint" id="manifestHint" data-copy="manifestHint">复制下面的实际指纹，手动粘贴到上方，再运行验证。</p>
+          <label class="actual-label" for="actual" data-copy="actualLabel">当前脚本的实际 SHA-256</label>
+          <div class="inline">
+            <input id="actual" readonly spellcheck="false">
+            <button type="button" id="copyHash" class="plain" data-copy="copy" disabled>复制</button>
+          </div>
+          <p class="hint" data-copy="pinned">演示发布方原签名保持不变。</p>
+          <p class="hint" id="copyStatus" aria-live="polite" hidden></p>
+        </article>
+      </div>
+      <p class="lab-note" data-copy="fixtureNote">课堂样本沿用真实文件名。内容为无害文本，网页不会执行。</p>
+    </section>
+
+    <section class="evidence" aria-labelledby="evidenceTitle">
+      <div class="evidence-header">
+        <div>
+          <p class="label" data-copy="evidenceLabel">OBSERVATIONS</p>
+          <h2 id="evidenceTitle" data-copy="evidenceTitle">证据与响应</h2>
+        </div>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Evidence views">
+          <button id="integrityTab" type="button" role="tab" aria-controls="integrityPane" data-tab="integrity" data-copy="tabFiles">文件证据</button>
+          <button id="networkTab" type="button" role="tab" aria-controls="networkPane" data-tab="network" data-copy="tabNetwork">连接审计</button>
+          <button id="nodesTab" type="button" role="tab" aria-controls="nodesPane" data-tab="nodes" data-copy="tabNodes">分发节点</button>
+          <button id="responseTab" type="button" role="tab" aria-controls="responsePane" data-tab="response" data-copy="tabResponse">响应报告</button>
+        </div>
+      </div>
+      <div id="integrityPane" role="tabpanel" aria-labelledby="integrityTab" class="pane">
+        <div id="fileEvidence"></div>
+        <div id="eventLog"></div>
+      </div>
+      <div id="networkPane" role="tabpanel" aria-labelledby="networkTab" class="pane" hidden>
+        <div class="pane-head">
+          <p class="hint" data-copy="networkHint">下方为模拟的请求记录。地址白名单提供连接线索，文件仍需独立验证。</p>
+          <button type="button" id="networkToggle" class="plain" aria-pressed="false"></button>
+        </div>
+        <div id="networkEvidence"></div>
+      </div>
+      <div id="nodesPane" role="tabpanel" aria-labelledby="nodesTab" class="pane" hidden>
+        <div class="pane-head">
+          <p class="hint" data-copy="nodesHint">用当前所选脚本模拟节点副本。每个节点的内容都与可信发布基准比较。</p>
+          <div class="actions">
+            <button type="button" id="probeOne" class="plain" data-copy="probeOne">测试单个节点</button>
+            <button type="button" id="probeAll" class="plain" data-copy="probeAll">测试所有节点</button>
+          </div>
+        </div>
+        <div id="nodeEvidence" aria-live="polite"></div>
+      </div>
+      <div id="responsePane" role="tabpanel" aria-labelledby="responseTab" class="pane" hidden>
+        <div class="pane-head">
+          <p class="hint" data-copy="responseHint">可记录模拟隔离并导出报告。网页只操作演示数据。</p>
+          <div class="actions">
+            <button type="button" id="contain" class="plain" data-copy="contain">模拟隔离</button>
+            <button type="button" id="export" class="primary" data-copy="export">下载报告</button>
+          </div>
+        </div>
+        <div id="responseEvidence" aria-live="polite"></div>
+        <ul id="checklist" class="checklist"></ul>
+      </div>
+    </section>
+    <footer>
+      <span data-copy="footer">教学演示 · 实际运行验签与哈希校验 · 连接、节点与处置为模拟</span>
+      <a href="https://github.com/Cobblepot2/Supply-Shield" target="_blank" rel="noreferrer" data-copy="source">查看源码 ↗</a>
+    </footer>
+    <noscript>Supply Shield needs JavaScript. 此演示需要 JavaScript。</noscript>
+  </main>
+</body>
+</html>

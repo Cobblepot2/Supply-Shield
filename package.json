@@ -1,0 +1,11 @@
+{
+  "name": "supply-shield",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test",
+    "offline": "node scripts/offline.mjs"
+  }
+}
