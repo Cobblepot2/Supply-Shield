@@ -1,43 +1,35 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { fixture } from '../public/fixture.js';
-import { auditConnections, compareNodes, sha256, verifyRelease } from '../public/verify.js';
+import { newPublisher, publishRelease, sha256, textBytes, verifyRelease } from '../public/verify.js';
 
-const original = JSON.parse(fixture.manifest);
-const selected = original.files[0];
-const edit = { ...fixture.samples, [selected.id]: fixture.samples[selected.id] + '// pre' };
+const publisher = await newPublisher();
+const original = new Map([['config.json', textBytes('{"mode":"normal"}')], ['bytes.bin', Uint8Array.of(0, 255, 8)]]);
+const release = await publishRelease(publisher, 7, original);
 
-test('authorized release passes its publisher signature and all four contents', async () => {
-  const result = await verifyRelease(fixture, fixture.samples, original);
-  assert.equal(result.signatureValid, true);
-  assert.equal(result.allowed, true);
-  assert.equal(result.rows.filter(({ match }) => match).length, 4);
+test('publisher signs typed text and exact binary file bytes', async () => {
+  const report = await verifyRelease(publisher.publicKey, release.signature, release.manifest, original);
+  assert.equal(report.allowed, true);
+  assert.deepEqual(report.rows.map(({ state }) => state), ['match', 'match']);
+  assert.equal(report.version, 7);
+  assert.equal(publisher.privateKey.extractable, false);
 });
 
-test('changing one script blocks loading while the publisher signature still passes', async () => {
-  const result = await verifyRelease(fixture, edit, original);
-  assert.equal(result.signatureValid, true);
-  assert.equal(result.allowed, false);
-  assert.deepEqual(result.rows.filter(({ match }) => !match).map(({ id }) => id), [selected.id]);
+test('modified, missing and extra delivery bytes are reported without changing the signed baseline', async () => {
+  const different = new Map([['config.json', textBytes('{"mode":"other"}')], ['unlisted.txt', textBytes('sample')]]);
+  const report = await verifyRelease(publisher.publicKey, release.signature, release.manifest, different);
+  assert.equal(report.signatureValid, true);
+  assert.equal(report.allowed, false);
+  assert.deepEqual(report.rows.map(({ state }) => state), ['changed', 'missing', 'extra']);
+  assert.equal(release.manifest.files[0].sha256, await sha256(original.get('config.json')));
 });
 
-test('matching a rewritten manifest still blocks loading because its signature fails', async () => {
-  const editedManifest = structuredClone(original);
-  editedManifest.files[0].sha256 = await sha256(edit[selected.id]);
-  const result = await verifyRelease(fixture, edit, editedManifest);
-  assert.equal(result.rows.filter(({ match }) => match).length, 4);
-  assert.equal(result.signatureValid, false);
-  assert.equal(result.allowed, false);
-});
-
-test('equally changed node copies agree with each other and fail the trusted reference', async () => {
-  const copies = ['A','B','C'].map((name) => ({ name, contents: edit[selected.id] }));
-  const result = await compareNodes(selected.sha256, copies);
-  assert.equal(new Set(result.map(({ hash }) => hash)).size, 1);
-  assert.ok(result.every(({ match }) => !match));
-});
-
-test('the synthetic allowlist flags requests to unlisted hosts', () => {
-  const requests = [{ host: 'release-cdn.example' }, { host: 'unrecognized.example' }];
-  assert.deepEqual(auditConnections(requests, ['release-cdn.example']).map(({ accepted }) => accepted), [true, false]);
+test('a rewritten manifest with matching hashes does not pass the original signature', async () => {
+  const different = new Map(original);
+  different.set('bytes.bin', Uint8Array.of(0, 255, 9));
+  const rewritten = structuredClone(release.manifest);
+  rewritten.files[1].sha256 = await sha256(different.get('bytes.bin'));
+  const report = await verifyRelease(publisher.publicKey, release.signature, rewritten, different);
+  assert.ok(report.rows.every(({ state }) => state === 'match'));
+  assert.equal(report.signatureValid, false);
+  assert.equal(report.allowed, false);
 });

@@ -1,0 +1,54 @@
+.consensus-view { min-width: 0; }
+.consensus-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.consensus-head h3 { margin-top: 3px; font-size: clamp(20px, 3vw, 27px); line-height: 1.15; letter-spacing: -.02em; }
+.consensus-file { color: var(--muted, #acbdcd); font: 12px/1.5 var(--mono, monospace); margin-top: 4px; overflow-wrap: anywhere; }
+.consensus-head > div:first-child { min-width: 0; }
+.consensus-modes { display: flex; gap: 6px; flex-wrap: wrap; }
+.consensus-modes button[aria-pressed=true] { color: var(--mint, #93e9cf); background: #234144; border-color: #507c77; }
+.consensus-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(205px, 255px); gap: 12px; }
+.consensus-map-panel { display: grid; align-content: center; min-width: 0; margin: 0; border: 1px solid var(--line, #2d4155); border-radius: 9px; background: #101e2b; overflow: hidden; }
+.consensus-map { display: block; width: 100%; height: auto; }
+.consensus-land { fill: #304857; stroke: #597581; stroke-width: 1.05; stroke-linejoin: round; }
+.consensus-gridline { fill: none; stroke: #2a4153; stroke-width: 1; opacity: .75; }
+.consensus-links { pointer-events: none; }
+.consensus-link { fill: none; stroke: #6ddabd; stroke-width: 1.35; stroke-dasharray: 4 8; opacity: .42; animation: consensus-flow 3s linear infinite; }
+@keyframes consensus-flow { to { stroke-dashoffset: -36; } }
+.consensus-dot { cursor: pointer; outline: 0; }
+.consensus-dot .consensus-hit { fill: transparent; }
+.consensus-dot .consensus-ring { fill: none; stroke: currentColor; stroke-width: 1.3; opacity: .36; }
+.consensus-dot .consensus-core { fill: currentColor; stroke: #0d1c27; stroke-width: 1.5; }
+.consensus-dot:hover .consensus-ring,
+.consensus-dot:focus .consensus-ring,
+.consensus-dot.selected .consensus-ring { opacity: 1; stroke-width: 2; stroke: #f8fcff; }
+.consensus-dot:focus-visible .consensus-ring { stroke-dasharray: 2 2; }
+.consensus-good { color: var(--mint, #93e9cf); }
+.consensus-alert { color: var(--red, #ffb5a9); }
+.consensus-dot.consensus-good { color: #65e4a6; }
+.consensus-dot.consensus-alert { color: #ff777a; }
+.consensus-legend { display: flex; gap: 8px 13px; flex-wrap: wrap; align-self: end; padding: 7px 10px; border-top: 1px solid var(--line, #2d4155); font-size: 11px; }
+.consensus-legend > span:not(.consensus-attribution)::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-inline-end: 4px; background: currentColor; }
+.consensus-attribution { margin-inline-start: auto; color: var(--muted, #acbdcd); }
+.consensus-info { min-width: 0; font-size: 12px; border: 1px solid var(--line, #2d4155); border-radius: 9px; background: #182938; padding: 10px 12px; }
+.consensus-info label { display: block; color: var(--muted, #acbdcd); }
+.consensus-info select { display: block; width: 100%; margin: 3px 0 7px; color: var(--text, #edf4fa); border: 1px solid #426079; border-radius: 5px; background: #101e2b; padding: 4px 6px; }
+.consensus-node-detail { display: flex; gap: 5px; align-items: baseline; flex-wrap: wrap; justify-content: space-between; }
+.consensus-node-detail code { color: var(--muted, #acbdcd); font: 11px/1.35 var(--mono, monospace); }
+.consensus-hash { display: block; max-width: 100%; color: #ccdaeb; font: 11px/1.35 var(--mono, monospace); overflow-wrap: anywhere; }
+.consensus-info p { margin-top: 2px; }
+.consensus-verification { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--line, #2d4155); }
+.consensus-verification .label { display: block; margin-top: 5px; font-size: 10px; }
+.consensus-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; gap: 12px; }
+.consensus-stat { border-top: 1px solid var(--line, #2d4155); padding-top: 6px; }
+.consensus-stat span { display: block; font-size: 12px; color: var(--muted, #acbdcd); }
+.consensus-stat strong { display: block; font: 650 clamp(15px, 2.2vw, 22px)/1.35 var(--mono, monospace); overflow-wrap: anywhere; }
+.consensus-note { margin-top: 8px; }
+@media (max-width: 810px) {
+  .consensus-layout { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+  .consensus-stats { gap: 6px; }
+}
+@media (max-width: 450px) {
+  .consensus-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .consensus-link { animation: none; }
+}

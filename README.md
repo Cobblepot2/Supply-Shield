@@ -1,27 +1,19 @@
 # Supply Shield
 
-A browser-based COMP5578 Option 2 lab about runtime resource integrity in the NIKKE PC launcher case. The launcher executable retained a valid signature. Four files fetched from the publisher’s CDN were modified. The embedded browser loaded the runtime resources, and affected launches could receive a K2F information-stealing payload. Bitdefender reported a download, collection, exfiltration and cleanup sequence lasting under ten minutes.
+A bilingual browser lab for rehearsing software update delivery defenses. The experiment models a publisher, a distribution channel and a client. Files, rules and reports stay inside the browser.
 
-## Two-minute presentation
+## Modules
 
-1. Open the site. The initial check verifies the original manifest and accepts all four classroom samples.
-2. In the first editor add a line such as `// pre` to the selected file. Select **Run verification**. The manifest signature still passes. The content comparison is **3/4** and loading is blocked.
-3. Copy the measured fingerprint and manually paste it into the second editor. Verify again. The hash-only comparison is **4/4** while the original publisher signature fails, so loading stays blocked.
-4. If time permits, open **Connection audit**, **CDN nodes**, or **Response report**. You can add a synthetic request observation, compare one or all three affected node copies with the signed baseline, or record simulated quarantine and download the evidence.
+- **File integrity.** Type original content or import files. The lab uses a session-local, non-exportable ECDSA P-256 private key to sign a versioned SHA-256 manifest. Receive a separate copy, manually edit its text or replace its bytes, then verify. The advanced exercise lets you manually edit the received manifest and observe why matching hashes cannot replace a valid publisher signature.
+- **Connection audit.** Apply your own allowed hosts, then enter a destination for the simulated process of a selected received file. The audit compares the normalized host exactly. No traffic is sent to the destination.
+- **Community consensus.** A preset 50-node world map yields 47 matching reports and three regional deviations. Node details show the digest and location. The whole-network variant demonstrates that 100% agreement can still disagree with the publisher baseline. The map uses [Natural Earth public-domain data](https://www.naturalearthdata.com/about/terms-of-use/).
+- **Incident response.** Review current signals, try simulated quarantine, and create a prioritized checklist from an explicit execution assumption and a role or asset selection. Mark actions complete and download or print an exercise report. The application does not inspect live devices, user accounts or credentials.
 
-Chinese is the default. Use the language button or `?lang=en` for English. **Restore sample** clears edits and brings the demo back to the signed baseline.
+All checks run locally. Delivery, process observations, node reports and response actions are synthetic. Publisher signing takes place in the same browser session to demonstrate the separate publishing and verification steps.
 
-## What the browser does
+## Run
 
-- The editor stages harmless text named after the four case files. The simulated launcher executable stays fixed.
-- The browser verifies an ECDSA P-256 signature over the compact manifest and computes SHA-256 over the current file text. Loading in the simulation requires both checks. A hash-only comparison is marked as illustrative when the signature is rejected.
-- The CDN comparison hashes the displayed classroom copies and checks them against the original signed release. It illustrates why node agreement alone does not establish authenticity.
-- Request observations and quarantine are simulated. The browser does not inspect OS processes or credential stores or contact CDN nodes. It never evaluates sample edits as code. Reports include check decisions and hashes, along with the labelled simulation records.
-- This is the web proof of concept from the design. File-system watches, process telemetry, real quarantine, VirusTotal and a privileged local agent would require separate integrations.
-
-## Run and publish
-
-Use Node.js 22 or later. The public site has no build dependencies, secrets or backend.
+Requires Node.js 22 or later. No dependencies or environment variables are needed.
 
 ```sh
 npm test
@@ -29,10 +21,4 @@ npm run dev
 npm run offline
 ```
 
-The local server is `http://127.0.0.1:4180/`. The offline command writes `dist/supply-shield.html`, which runs in current Edge and Chrome. Generate fresh classroom fixtures with `node scripts/make-fixtures.mjs`. The generator keeps the temporary private key in memory and writes only the public verification material. Vercel serves `public/`.
-
-## Sources
-
-- [MotherSphere’s analysis and incident timeline](https://gist.github.com/MotherSphere/d6c049a09ba8ac3085c51ee9df24a4e5)
-- [Bitdefender Labs’ endpoint analysis](https://www.bitdefender.com/en-gb/blog/labs/nikke-game-launcher-malware)
-- [Microsoft’s Authenticode description](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/authenticode)
+Open `http://127.0.0.1:4180/` locally, or `dist/supply-shield.html` in Edge or Chrome for offline presentation. The deployed Vercel project serves `public/`. Use `?lang=en` for English, or `?tab=consensus` to open the map directly.

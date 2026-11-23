@@ -1,35 +1,48 @@
-const encoder = new TextEncoder();
-const decodeBase64 = (text) => Uint8Array.from(atob(text), (char) => char.charCodeAt(0));
-const hex = (bytes) => [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+const enc = new TextEncoder();
+const alphabet = (bytes) => [...new Uint8Array(bytes)].map((value) => value.toString(16).padStart(2, '0')).join('');
 
-export async function sha256(text) {
-  return hex(await crypto.subtle.digest('SHA-256', encoder.encode(text)));
+export const textBytes = (value) => enc.encode(value);
+
+export async function sha256(bytes) {
+  const data = typeof bytes === 'string' ? textBytes(bytes) : bytes;
+  return alphabet(await crypto.subtle.digest('SHA-256', data));
 }
 
-export async function verifyRelease(release, currentFiles, candidate) {
-  const payload = JSON.stringify(candidate);
-  const publicKey = await crypto.subtle.importKey('spki', decodeBase64(release.publicKey),
-    { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
-  const signatureValid = await crypto.subtle.verify(
-    { name: 'ECDSA', hash: 'SHA-256' }, publicKey, decodeBase64(release.signature), encoder.encode(payload),
-  );
-
-  // If the signature fails, the rows only explain what a hash-only check would have reported.
-  const rows = await Promise.all(candidate.files.map(async ({ id, sha256: expected }) => {
-    const actual = await sha256(currentFiles[id]);
-    return { id, expected, actual, match: expected === actual };
-  }));
-  return { signatureValid, allowed: signatureValid && rows.every((row) => row.match), rows };
+export async function newPublisher() {
+  return crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify']);
 }
 
-export function auditConnections(entries, allowlist) {
-  const allowed = new Set(allowlist);
-  return entries.map((entry) => ({ ...entry, accepted: allowed.has(entry.host) }));
+export async function publishRelease(publisher, version, files) {
+  if (!files.size) throw new Error('Empty release');
+  const entries = await Promise.all([...files].map(async ([id, bytes]) => ({ id, sha256: await sha256(bytes) })));
+  const manifest = { version, files: entries };
+  const signature = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' },
+    publisher.privateKey, textBytes(JSON.stringify(manifest)));
+  return { manifest, signature };
 }
 
-export async function compareNodes(approvedHash, sources) {
-  return Promise.all(sources.map(async ({ name, contents }) => {
-    const hash = await sha256(contents);
-    return { name, hash, match: hash === approvedHash };
-  }));
+export async function verifyRelease(key, signature, manifest, received) {
+  const signatureValid = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' },
+    key, signature, textBytes(JSON.stringify(manifest)));
+  const actualHashes = new Map(await Promise.all(
+    [...received].map(async ([id, bytes]) => [id, await sha256(bytes)]),
+  ));
+  const rows = manifest.files.map(({ id, sha256: expected }) => {
+    const actual = actualHashes.get(id) ?? null;
+    return { id, expected, actual, state: actual === null ? 'missing' : expected === actual ? 'match' : 'changed' };
+  });
+  const listed = new Set(manifest.files.map(({ id }) => id));
+  for (const [id, actual] of actualHashes) {
+    if (!listed.has(id)) rows.push({ id, expected: null, actual, state: 'extra' });
+  }
+  return {
+    version: manifest.version, signatureValid, rows,
+    allowed: signatureValid && rows.length > 0 && rows.every(({ state }) => state === 'match'),
+  };
 }
+
+export const exampleFiles = {
+  'update.js': '// Classroom sample for a software update.\n',
+  'release.json': '{ "channel": "stable", "build": 42 }\n',
+  'readme.txt': 'Version 42 includes interface improvements.\n',
+};

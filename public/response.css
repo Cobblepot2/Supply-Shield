@@ -1,0 +1,120 @@
+.ss-response {
+  display: grid;
+  gap: 14px;
+  color: var(--text, #edf4fa);
+}
+.ss-response h3 { font-size: 22px; letter-spacing: -.025em; margin: 2px 0 4px; }
+.ss-response h4 { font-size: 16px; margin: 0; }
+.ss-response-heading, .ss-response-buttons, .ss-response-isolation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.ss-response-buttons, .ss-response-isolation { justify-content: flex-start; }
+.ss-response-eyebrow {
+  color: var(--mint, #93e9cf);
+  font: 650 11px/1.5 var(--mono, monospace);
+  letter-spacing: .1em;
+}
+.ss-response-muted, .ss-response-export-status {
+  color: var(--muted, #acbdcd);
+  font-size: 13px;
+}
+.ss-response-export-status:empty { display: none; }
+.ss-response-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.ss-response-setup, .ss-response-evidence, .ss-response-checklist {
+  border: 1px solid var(--line, #2d4155);
+  background: var(--panel-2, #182938);
+  padding: 12px;
+  border-radius: 8px;
+}
+.ss-response-setup, .ss-response-evidence { display: grid; gap: 9px; align-content: start; }
+.ss-response-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ss-response-select { display: grid; align-content: start; gap: 4px; font-size: 13px; font-weight: 650; }
+.ss-response-select select {
+  min-width: 0;
+  width: 100%;
+  padding: 6px 8px;
+  color: inherit;
+  background: var(--bg, #0e1721);
+  border: 1px solid var(--line, #2d4155);
+  border-radius: 6px;
+  font: inherit;
+}
+.ss-response-assets { border: 0; min-width: 0; margin: 0; padding: 0; font-size: 13px; }
+.ss-response-assets legend { color: var(--muted, #acbdcd); padding: 0; margin-bottom: 4px; }
+.ss-response-asset {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  gap: 5px;
+  margin: 0 10px 2px 0;
+}
+.ss-response :is(input[type=checkbox], progress) { accent-color: var(--mint, #93e9cf); }
+.ss-response input[type=checkbox] { margin: 0; width: 15px; height: 15px; flex: none; }
+.ss-response-level { font-size: 16px; }
+.ss-response-evidence[data-level=signals] .ss-response-level,
+.ss-response-evidence[data-level=assumed] .ss-response-level { color: #ffd397; }
+.ss-response-blocked { color: var(--red, #ffb5a9); font-size: 13px; }
+.ss-response-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.ss-response-stats > div { border-top: 1px solid var(--line, #2d4155); padding-top: 3px; }
+.ss-response-stats dt { color: var(--muted, #acbdcd); font-size: 12px; }
+.ss-response-stats dd { margin: 0; font: 700 18px/1.4 var(--mono, monospace); }
+.ss-response-count { color: var(--mint, #93e9cf); font: 650 13px/1.5 var(--mono, monospace); }
+.ss-response-progress { display: block; width: 100%; height: 7px; margin: 7px 0 8px; border: 0; }
+.ss-response-progress::-webkit-progress-bar { background: var(--bg, #0e1721); border-radius: 4px; }
+.ss-response-progress::-webkit-progress-value { background: var(--mint, #93e9cf); border-radius: 4px; }
+.ss-response-action-list { list-style: none; margin: 0; padding: 0; }
+.ss-response-action { position: relative; border-top: 1px solid var(--line, #2d4155); }
+.ss-response-action-label { min-height: 36px; display: flex; align-items: center; gap: 7px; padding: 5px 94px 5px 0; font-size: 13px; }
+.ss-response-action-label span { overflow-wrap: anywhere; }
+.ss-response-action[data-done=true] .ss-response-action-label span { color: var(--muted, #acbdcd); text-decoration: line-through; }
+.ss-response-action-details summary {
+  position: absolute;
+  right: 0;
+  top: 6px;
+  padding-inline: 6px;
+  border-radius: 4px;
+  color: #ffd397;
+  background: #433729;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ss-response-action[data-priority='2'] summary { color: #c6d8f0; background: #253f55; }
+.ss-response-action[data-priority='3'] summary { color: var(--mint, #93e9cf); background: #203f3f; }
+.ss-response-action-details[open] > p { margin: 0 0 7px 22px; }
+.ss-response-print { display: none; }
+
+@media (max-width: 700px) {
+  .ss-response-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .ss-response-options { grid-template-columns: 1fr; }
+}
+@media print {
+  body:has(.ss-response-print) {
+    background: white !important;
+    color: black !important;
+  }
+  body:has(.ss-response-print) > :not(.ss-response-print) { display: none !important; }
+  .ss-response-print {
+    display: block !important;
+    margin: 10mm;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font: 11pt/1.5 sans-serif;
+    color: black;
+  }
+}
