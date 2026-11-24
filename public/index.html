@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Supply Shield is an interactive lab for software supply chain delivery defense.">
-  <title>Supply Shield · 供应链更新防御实验台</title>
+  <title>Supply Shield · Supply chain defense lab</title>
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./network.css">
@@ -17,38 +17,38 @@
     <div class="frame mast-inner">
       <a class="brand" href="?"><img src="./icon.svg" alt="" width="42" height="42"><span>Supply Shield</span></a>
       <div class="mast-right">
-        <span class="class-id" data-copy="course">COMP5578 · 防御实验</span>
-        <button type="button" class="plain" id="language" lang="en">EN</button>
+        <span class="class-id" data-copy="course">COMP5578 · DEFENSE LAB</span>
+        <button type="button" class="plain" id="language" lang="zh-CN" aria-label="切换到中文">中文</button>
       </div>
     </div>
   </header>
   <main class="frame">
     <section class="hero" aria-labelledby="heading">
       <div>
-        <p class="label"><span class="dot"></span><span data-copy="label">软件分发与更新</span></p>
-        <h1 id="heading" data-copy="heading">供应链更新防御实验台</h1>
-        <p class="lede" data-copy="lede">模拟从总部发布、分发到客户端加载的全过程。用自己输入的文件和规则验证每一步。</p>
+        <p class="label"><span class="dot"></span><span data-copy="label">SOFTWARE DELIVERY</span></p>
+        <h1 id="heading" data-copy="heading">Supply chain defense lab</h1>
+        <p class="lede" data-copy="lede">Model a release from publisher to client. Verify every step with files and rules you choose.</p>
       </div>
-      <div class="route" aria-hidden="true"><span data-copy="publisher">总部</span><i></i><span>CDN</span><i></i><span data-copy="client">客户端</span></div>
+      <div class="route" aria-hidden="true"><span data-copy="publisher">Publisher</span><i></i><span>CDN</span><i></i><span data-copy="client">Client</span></div>
     </section>
 
     <nav class="nav-shell">
-      <div class="tabs" id="tabs" role="tablist" aria-label="防御模块">
-        <button id="integrityTab" type="button" role="tab" aria-controls="integrityPane" data-tab="integrity" data-copy="integrity">文件完整性</button>
-        <button id="networkTab" type="button" role="tab" aria-controls="networkPane" data-tab="network" data-copy="network">网络行为审计</button>
-        <button id="consensusTab" type="button" role="tab" aria-controls="consensusPane" data-tab="consensus" data-copy="consensus">社区共识</button>
-        <button id="responseTab" type="button" role="tab" aria-controls="responsePane" data-tab="response" data-copy="response">应急响应</button>
+      <div class="tabs" id="tabs" role="tablist" aria-label="Defense modules">
+        <button id="integrityTab" type="button" role="tab" aria-controls="integrityPane" data-tab="integrity" data-copy="integrity">File integrity</button>
+        <button id="networkTab" type="button" role="tab" aria-controls="networkPane" data-tab="network" data-copy="network">Connection audit</button>
+        <button id="consensusTab" type="button" role="tab" aria-controls="consensusPane" data-tab="consensus" data-copy="consensus">Community consensus</button>
+        <button id="responseTab" type="button" role="tab" aria-controls="responsePane" data-tab="response" data-copy="response">Incident response</button>
       </div>
-      <button type="button" class="plain" id="reset" data-copy="reset">重置演练</button>
+      <button type="button" class="plain" id="reset" data-copy="reset">Reset exercise</button>
     </nav>
 
     <section id="integrityPane" class="bench" role="tabpanel" aria-labelledby="integrityTab">
       <div class="bench-top">
         <div>
-          <p class="label" data-copy="integrityLabel">签名清单与文件哈希</p>
-          <h2 data-copy="integrityHeading">发布基线，验证收到的文件</h2>
+          <p class="label" data-copy="integrityLabel">SIGNATURES AND FILE HASHES</p>
+          <h2 data-copy="integrityHeading">Publish a baseline, then verify delivery</h2>
         </div>
-        <button type="button" id="run" class="primary" data-copy="run">运行验证</button>
+        <button type="button" id="run" class="primary" data-copy="run">Run verification</button>
       </div>
       <div id="verdict" class="verdict" data-state="pending" role="status" aria-live="polite"></div>
       <div id="signals" class="signals"></div>
@@ -56,52 +56,52 @@
       <div class="workbench">
         <section class="work-column" aria-labelledby="publisherHeading">
           <div class="work-head">
-            <div><p class="label">01</p><h3 id="publisherHeading" data-copy="publisherTitle">总部发布</h3></div>
-            <button type="button" class="plain" id="importSource" data-copy="importSource">选择本地原始文件</button>
+            <div><p class="label">01</p><h3 id="publisherHeading" data-copy="publisherTitle">Publisher release</h3></div>
+            <button type="button" class="plain" id="importSource" data-copy="importSource">Select original files</button>
             <input type="file" id="sourceInput" multiple hidden>
           </div>
-          <p class="hint" data-copy="sourceHelp">输入初始内容，或选择一组本地原始文件。确认后签发基线。</p>
-          <label for="draftFile" data-copy="draftFile">总部草稿文件</label>
+          <p class="hint" data-copy="sourceHelp">Type the initial content or choose local originals, then sign a release.</p>
+          <label for="draftFile" data-copy="draftFile">Publisher draft</label>
           <select id="draftFile"></select>
-          <label for="publisherEdit" class="sr" data-copy="publisherEdit">总部文件内容</label>
+          <label for="publisherEdit" class="sr" data-copy="publisherEdit">Publisher file content</label>
           <textarea id="publisherEdit" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="300000"></textarea>
           <p id="draftBytes" class="hint"></p>
           <div class="add-row">
-            <input id="newFile" type="text" maxlength="96" autocomplete="off" spellcheck="false" aria-label="新文件名">
-            <button type="button" id="addFile" class="plain" data-copy="addFile">增加草稿</button>
-            <button type="button" id="removeDraft" class="plain" data-copy="remove">移除</button>
+            <input id="newFile" type="text" maxlength="96" autocomplete="off" spellcheck="false" aria-label="New filename" placeholder="e.g. update.js">
+            <button type="button" id="addFile" class="plain" data-copy="addFile">Add draft</button>
+            <button type="button" id="removeDraft" class="plain" data-copy="remove">Remove</button>
           </div>
           <div class="work-actions">
-            <button type="button" id="publish" class="primary" data-copy="publish">签名并发布基线</button>
+            <button type="button" id="publish" class="primary" data-copy="publish">Sign and publish baseline</button>
             <p id="releaseStatus" class="hint" role="status"></p>
           </div>
         </section>
 
         <section class="work-column" aria-labelledby="clientHeading">
           <div class="work-head">
-            <div><p class="label">02</p><h3 id="clientHeading" data-copy="clientTitle">客户端接收</h3></div>
-            <button type="button" class="plain" id="receive" data-copy="receive">从 CDN 接收</button>
+            <div><p class="label">02</p><h3 id="clientHeading" data-copy="clientTitle">Client intake</h3></div>
+            <button type="button" class="plain" id="receive" data-copy="receive">Receive from CDN</button>
           </div>
-          <p class="hint" data-copy="receiveHelp">接收后，手动修改下方副本。再运行验证，看哪些文件偏离发布基线。</p>
-          <label for="receivedFile" data-copy="receivedFile">待加载文件</label>
+          <p class="hint" data-copy="receiveHelp">Receive the files, edit a copy below, and run verification.</p>
+          <label for="receivedFile" data-copy="receivedFile">Staged file</label>
           <select id="receivedFile"></select>
-          <label for="receivedEdit" class="sr" data-copy="receivedEdit">收到的文件内容</label>
+          <label for="receivedEdit" class="sr" data-copy="receivedEdit">Received file content</label>
           <textarea id="receivedEdit" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="300000"></textarea>
           <p id="receivedBytes" class="hint"></p>
           <div class="work-actions">
-            <button type="button" id="importReceived" class="plain" data-copy="importReceived">添加或替换副本</button>
-            <button type="button" id="removeReceived" class="plain" data-copy="remove">移除</button>
+            <button type="button" id="importReceived" class="plain" data-copy="importReceived">Add or replace copies</button>
+            <button type="button" id="removeReceived" class="plain" data-copy="remove">Remove</button>
             <input type="file" id="receivedInput" multiple hidden>
             <p id="cloudStatus" class="hint" role="status"></p>
           </div>
         </section>
       </div>
       <details class="challenge">
-        <summary data-copy="challenge">进阶演练 · 手动修改接收端清单</summary>
-        <p class="hint" data-copy="challengeHint">复制新文件指纹，手动填入收到的清单再验证。总部的原签名会保留。</p>
+        <summary data-copy="challenge">Advanced exercise · Edit the received manifest</summary>
+        <p class="hint" data-copy="challengeHint">Copy the new fingerprint into the received manifest yourself, then verify. The original signature stays fixed.</p>
         <div class="hash-editors">
-          <div><label for="listedHash" data-copy="listedLabel">接收清单指纹</label><input id="listedHash" type="text" maxlength="64" autocomplete="off" spellcheck="false"></div>
-          <div><label for="actualHash" data-copy="actualLabel">最后一次验证所得指纹</label><div class="inline"><input id="actualHash" type="text" readonly><button type="button" id="copyHash" class="plain" data-copy="copy">复制</button></div></div>
+          <div><label for="listedHash" data-copy="listedLabel">Received manifest fingerprint</label><input id="listedHash" type="text" maxlength="64" autocomplete="off" spellcheck="false"></div>
+          <div><label for="actualHash" data-copy="actualLabel">Last measured fingerprint</label><div class="inline"><input id="actualHash" type="text" readonly><button type="button" id="copyHash" class="plain" data-copy="copy">Copy</button></div></div>
         </div>
         <p id="copyStatus" class="hint" role="status"></p>
       </details>
@@ -113,10 +113,10 @@
     <section id="responsePane" class="bench module-pane" role="tabpanel" aria-labelledby="responseTab" hidden></section>
 
     <footer>
-      <span data-copy="footer">教学模拟 · 在本机计算文件哈希与验证签名 · 收件、连接、节点和处置为演练数据</span>
-      <a href="https://github.com/Cobblepot2/Supply-Shield" target="_blank" rel="noreferrer" data-copy="source">查看源码 ↗</a>
+      <span data-copy="footer">Classroom simulation · Local hashing and signature checks · Simulated delivery, connections, nodes and response</span>
+      <a href="https://github.com/Cobblepot2/Supply-Shield" target="_blank" rel="noreferrer" data-copy="source">View source ↗</a>
     </footer>
-    <noscript>Supply Shield needs JavaScript. 演示需要 JavaScript。</noscript>
+    <noscript>Supply Shield needs JavaScript.</noscript>
   </main>
 </body>
 </html>

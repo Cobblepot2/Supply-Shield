@@ -20,7 +20,7 @@ const maxFiles = 20;
 const nameValid = (name) => name.length > 0 && name.length <= 96 &&
   name !== '.' && name !== '..' && !['/', '\\', ':'].some((character) => name.includes(character));
 
-let lang = params.get('lang') === 'en' ? 'en' : 'zh';
+let lang = params.get('lang') === 'zh' ? 'zh' : 'en';
 let activeTab = tabs.some((tab) => tab.dataset.tab === params.get('tab')) ? params.get('tab') : 'integrity';
 let draft = new Map();
 let delivered = new Map();
@@ -373,6 +373,7 @@ function activate(name, focus = false) {
 function applyLanguage() {
   const w = words();
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.title = 'Supply Shield · ' + w.heading;
   const language = byId('language');
   language.textContent = lang === 'zh' ? 'EN' : '中文';
   language.lang = lang === 'zh' ? 'en' : 'zh-CN';

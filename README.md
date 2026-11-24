@@ -21,4 +21,4 @@ npm run dev
 npm run offline
 ```
 
-Open `http://127.0.0.1:4180/` locally, or `dist/supply-shield.html` in Edge or Chrome for offline presentation. The deployed Vercel project serves `public/`. Use `?lang=en` for English, or `?tab=consensus` to open the map directly.
+Open `http://127.0.0.1:4180/` locally, or `dist/supply-shield.html` in Edge or Chrome for offline presentation. The deployed Vercel project serves `public/`. The default language is English. Use `?lang=zh` for Chinese, or `?tab=consensus` to open the map directly.
