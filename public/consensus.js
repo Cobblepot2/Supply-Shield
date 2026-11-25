@@ -64,8 +64,8 @@ const consensusNodes = [
 const consensusCopy = {
   zh: {
     eyebrow: '分发完整性', title: '社区共识验证', exampleFile: '演示资源',
-    regional: '部分节点内容偏离', synchronized: '所有节点收到同一偏离内容',
-    ratio: '多数哈希占比', normal: '基线一致', abnormal: '基线异常', region: '异常区域',
+    baseline: '正常分发', regional: '区域偏差', synchronized: '所有节点收到同一偏离内容',
+    ratio: '多数哈希占比', normal: '基线一致', abnormal: '基线异常', region: '异常区域', noRegion: '无',
     majority: '多数哈希', publisher: '发布基线', candidate: '客户端实收哈希',
     exampleBaseline: '演示基线', absent: '尚未验证', select: '选择节点', node: '节点',
     matches: '与发布基线一致', differs: '与发布基线不一致',
@@ -78,8 +78,8 @@ const consensusCopy = {
   },
   en: {
     eyebrow: 'DISTRIBUTION INTEGRITY', title: 'Community consensus', exampleFile: 'Sample resource',
-    regional: 'Regional variation', synchronized: 'All nodes serve the same altered content',
-    ratio: 'Majority share', normal: 'Baseline matches', abnormal: 'Baseline mismatches', region: 'Anomaly region',
+    baseline: 'Normal distribution', regional: 'Regional variation', synchronized: 'All nodes serve the same altered content',
+    ratio: 'Majority share', normal: 'Baseline matches', abnormal: 'Baseline mismatches', region: 'Anomaly region', noRegion: 'None',
     majority: 'Majority hash', publisher: 'Release baseline', candidate: 'Client-received hash',
     exampleBaseline: 'Sample baseline', absent: 'Not yet checked', select: 'Select a node', node: 'Node',
     matches: 'Matches the release baseline', differs: 'Differs from the release baseline',
@@ -96,18 +96,18 @@ function consensusValidHash(value) {
   return typeof value === 'string' && /^[a-f0-9]{64}$/i.test(value) ? value.toLowerCase() : null;
 }
 
-export function makeConsensusReports({ baselineHash = null, currentHash = null, mode = 'regional' } = {}) {
+export function makeConsensusReports({ baselineHash = null, currentHash = null, mode = 'baseline' } = {}) {
   const trusted = consensusValidHash(baselineHash) ?? consensusDefaultBaseline;
   const received = consensusValidHash(currentHash);
   const sampleVariant = consensusDefaultVariant === trusted ? consensusDefaultBaseline : consensusDefaultVariant;
   const variant = received && received !== trusted ? received : sampleVariant;
   return consensusNodes.map((node) => ({
     ...node,
-    hash: mode === 'synchronized' || node.region === 'us-west' ? variant : trusted,
+    hash: mode === 'synchronized' || (mode === 'regional' && node.region === 'us-west') ? variant : trusted,
   }));
 }
 
-export function aggregateConsensus(reports, { baselineHash = null, currentHash = null, mode = 'regional' } = {}) {
+export function aggregateConsensus(reports, { baselineHash = null, currentHash = null, mode = 'baseline' } = {}) {
   const trusted = consensusValidHash(baselineHash) ?? consensusDefaultBaseline;
   const received = consensusValidHash(currentHash);
   const votes = new Map();
@@ -152,7 +152,7 @@ function consensusXY(lon, lat) {
 
 export function createConsensus(container, { onChange } = {}) {
   let context = { lang: 'zh', baselineHash: null, currentHash: null, filename: '' };
-  let mode = 'regional';
+  let mode = 'baseline';
   let selected = 47;
   let summary, modeButtons, dots, picker, details, reports, links;
 
@@ -273,8 +273,8 @@ export function createConsensus(container, { onChange } = {}) {
       consensusHtml('p', context.filename || t.exampleFile, 'consensus-file'));
     const modes = consensusHtml('div', null, 'consensus-modes');
     modeButtons = new Map();
-    for (const [key, label] of [['regional', t.regional], ['synchronized', t.synchronized]]) {
-      const button = consensusHtml('button', label, 'plain');
+    for (const key of ['baseline', 'regional', 'synchronized']) {
+      const button = consensusHtml('button', t[key], 'plain');
       button.type = 'button';
       button.dataset.consensusMode = key;
       button.setAttribute('aria-pressed', String(mode === key));
@@ -324,10 +324,10 @@ export function createConsensus(container, { onChange } = {}) {
     info.append(pickerLabel, details, verification);
     grid.append(mapPanel, info);
     const stats = consensusHtml('div', null, 'consensus-stats');
-    const region = mode === 'synchronized' ? 'GLOBAL' : summary.anomalyRegions.join(', ');
+    const region = mode === 'synchronized' ? 'GLOBAL' : summary.anomalyRegions.join(', ') || t.noRegion;
     stats.append(stat(t.ratio, Math.round(summary.consensusRatio * 100) + '%', 'ratio'),
       stat(t.normal, summary.normalCount, 'normal', 'consensus-good'),
-      stat(t.abnormal, summary.anomalyCount, 'anomalies', 'consensus-alert'),
+      stat(t.abnormal, summary.anomalyCount, 'anomalies', summary.anomalyCount ? 'consensus-alert' : ''),
       stat(t.region, region, 'region'));
     area.append(head, grid, stats, consensusHtml('p', t.labNote, 'hint consensus-note'));
     container.replaceChildren(area);
@@ -348,7 +348,7 @@ export function createConsensus(container, { onChange } = {}) {
       return summary;
     },
     reset() {
-      mode = 'regional';
+      mode = 'baseline';
       selected = 47;
       context = { ...context, baselineHash: null, currentHash: null, filename: '' };
       render();

@@ -5,8 +5,19 @@ import { aggregateConsensus, makeConsensusReports } from '../public/consensus.js
 const baselineHash = 'a'.repeat(64);
 const currentHash = 'b'.repeat(64);
 
+test('default distribution starts with all 50 nodes matching the release', () => {
+  const config = { baselineHash, currentHash: baselineHash };
+  const result = aggregateConsensus(makeConsensusReports(config), config);
+  assert.equal(result.mode, 'baseline');
+  assert.equal(result.normalCount, 50);
+  assert.equal(result.anomalyCount, 0);
+  assert.equal(result.consensusRatio, 1);
+  assert.equal(result.currentMatchesBaseline, true);
+  assert.deepEqual(result.anomalyRegions, []);
+});
+
 test('regional simulation aggregates 47 baseline matches and three west coast anomalies', () => {
-  const config = { baselineHash, currentHash };
+  const config = { baselineHash, currentHash, mode: 'regional' };
   const reports = makeConsensusReports(config);
   const result = aggregateConsensus(reports, config);
   assert.equal(new Set(reports.map(({ id }) => id)).size, 50);
